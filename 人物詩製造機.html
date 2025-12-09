@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>人物詩製造機 | 智能潤飾版</title>
+    <style>
+        :root {
+            --primary-blue: #0D47A1; /* 深邃藍 */
+            --accent-blue: #42A5F5; /* 亮藍 */
+            --bg-color: #F5F9FC;
+            --white: #ffffff;
+            --text-color: #263238;
+            --shadow: 0 10px 25px rgba(13, 71, 161, 0.1);
+        }
+
+        body {
+            font-family: "Noto Serif TC", "Songti TC", serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            line-height: 1.7;
+        }
+
+        .container {
+            background-color: var(--white);
+            width: 100%;
+            max-width: 750px;
+            padding: 45px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            border-top: 6px solid var(--primary-blue);
+        }
+
+        h1 {
+            color: var(--primary-blue);
+            text-align: center;
+            margin-bottom: 8px;
+            font-weight: 800;
+            letter-spacing: 3px;
+            font-size: 2rem;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #546E7A;
+            font-size: 0.95em;
+            margin-bottom: 40px;
+            font-family: "Noto Sans TC", sans-serif;
+            font-weight: 300;
+        }
+
+        .input-wrapper {
+            display: grid;
+            gap: 20px;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        label {
+            display: block;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 6px;
+            font-size: 0.95em;
+            letter-spacing: 1px;
+        }
+
+        .hint {
+            font-size: 0.8em;
+            color: #90A4AE;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #ECEFF1;
+            border-radius: 10px;
+            font-family: "Noto Sans TC", sans-serif;
+            font-size: 1em;
+            background-color: #fff;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+            color: #333;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 4px rgba(66, 165, 245, 0.1);
+        }
+
+        input::placeholder {
+            color: #CFD8DC;
+        }
+
+        .btn-container {
+            text-align: center;
+            margin-top: 45px;
+        }
+
+        button {
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            color: white;
+            border: none;
+            padding: 16px 60px;
+            font-size: 1.1em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: "Noto Serif TC", serif;
+            letter-spacing: 4px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(13, 71, 161, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(13, 71, 161, 0.4);
+        }
+
+        /* Result Section */
+        #result-area {
+            display: none;
+            margin-top: 60px;
+            animation: slideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .poem-card {
+            background-color: #fff;
+            padding: 50px;
+            position: relative;
+            text-align: center;
+            border: 1px solid #eee;
+            /* 紙張質感 */
+            background-image: linear-gradient(#f8f8f8 1px, transparent 1px);
+            background-size: 100% 3em; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        .poem-title {
+            font-size: 2em;
+            font-weight: 800;
+            margin-bottom: 50px;
+            color: #000;
+            letter-spacing: 4px;
+        }
+
+        .poem-content {
+            font-size: 1.2em;
+            line-height: 2.5em; /* 配合背景格線 */
+            color: #444;
+            font-weight: 500;
+        }
+
+        .poem-stanza {
+            margin-bottom: 3em; /* 段落間距 */
+        }
+
+        .warning-text {
+            font-size: 0.75em;
+            color: #B0BEC5;
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .container { padding: 25px; }
+            button { width: 100%; }
+            .poem-title { font-size: 1.6em; }
+            .poem-content { font-size: 1.1em; }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;900&family=Noto+Sans+TC:wght@300;400&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="container">
+    <h1>人物詩製造機</h1>
+    <div class="subtitle">輸入日常碎片，由 AI 為您蒙太奇式顯影</div>
+
+    <form id="poemForm">
+        <div class="input-wrapper">
+            <div class="input-group">
+                <label>1. 主角身分</label>
+                <input type="text" id="identity" required placeholder="例：過勞的程式設計師 / 寂寞的警衛">
+            </div>
+
+            <div class="input-group">
+                <label>2. 兩個形容詞 (概括特質)</label>
+                <input type="text" id="adjectives" required placeholder="例：焦慮又透明 / 固執且生鏽">
+            </div>
+
+            <div class="input-group">
+                <label>3. 物件 / 特徵</label>
+                <input type="text" id="object" required placeholder="例：沒電的無線耳機 / 泛黃的識別證">
+            </div>
+
+            <div class="input-group">
+                <label>4. 地點 / 場景</label>
+                <input type="text" id="location" required placeholder="例：充滿藍光的機房 / 深夜便利店">
+            </div>
+
+            <div class="input-group">
+                <label>5. 常見動作 / 聲音</label>
+                <input type="text" id="action" required placeholder="例：盯著螢幕嘆氣 / 揉著乾澀的眼睛">
+            </div>
+
+            <div class="input-group">
+                <label>6. 經典台詞</label>
+                <input type="text" id="line" required placeholder="例：這行代碼沒問題啊... / 歡迎光臨">
+            </div>
+
+            <div class="input-group">
+                <label>7. 他人對角色的評論</label>
+                <input type="text" id="comment" required placeholder="例：聽說他三天沒回家了 / 像個機器人一樣">
+            </div>
+        </div>
+
+        <div class="warning-text">※ 系統將自動潤飾語句，請保持輸入簡潔以獲得最佳效果。</div>
+
+        <div class="btn-container">
+            <button type="submit">開始詩意重組</button>
+        </div>
+    </form>
+
+    <div id="result-area">
+        <div class="poem-card">
+            <div class="poem-title" id="output-title"></div>
+            <div class="poem-content" id="output-content"></div>
+        </div>
+        <div class="btn-container">
+            <button onclick="window.scrollTo({top: 0, behavior: 'smooth'}); document.getElementById('poemForm').reset();">創作下一個人物</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 輔助工具：隨機選取
+    function pick(array) {
+        return array[Math.floor(Math.random() * array.length)];
+    }
+
+    document.getElementById('poemForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // 1. 獲取並清理資料
+        const identity = document.getElementById('identity').value.trim();
+        const adjectives = document.getElementById('adjectives').value.trim();
+        const object = document.getElementById('object').value.trim();
+        const location = document.getElementById('location').value.trim();
+        const action = document.getElementById('action').value.trim();
+        const line = document.getElementById('line').value.trim();
+        const comment = document.getElementById('comment').value.trim();
+
+        // 2. 準備詞彙庫 (增加變化性)
+        const abstractNouns = ['獨角戲', '頻率', '註腳', '嘆息', '風景', '回音', '剪影'];
+        const poeticVerbs = ['流浪在', '散落在', '懸浮在', '蜷縮在', '遊蕩在'];
+        const noun = pick(abstractNouns);
+        const verb = pick(poeticVerbs);
+
+        // 3. 生成邏輯 (多套模板隨機選擇，讓語句更通順)
+
+        // --- 第一段：開場 ---
+        const s1_templates = [
+            `關於${identity}的傳聞${verb}${location}\n一段${adjectives}的${noun}`,
+            `${identity}的名字早已${verb}${location}\n帶著${adjectives}的氣息`,
+            `那${identity}啊${verb}城市的${location}裡\n一種${adjectives}的${noun}`
+        ];
+        const stanza1 = pick(s1_templates);
+
+        // --- 第二段：物件與特寫 (避免這總是"博物館") ---
+        const s2_templates = [
+            `那${object}或許該被寫進歷史\n可憐的${identity}啊${adjectives}得令人心碎`,
+            `那${object}本該由櫥窗來供養\n而${identity}只是靜靜地${adjectives}`,
+            `緊握著${object}的手指應由歲月來守衛\n小小的${identity}啊${adjectives}得讓人沈醉`
+        ];
+        const stanza2 = pick(s2_templates);
+
+        // --- 第三段：場景氛圍 (強化括號內的畫面感) ---
+        const s3_templates = [
+            `是${location}唯一的${noun}吧\n（日日夜夜那${action}的背影！）`,
+            `是${location}裡的荒謬劇吧\n（那些假裝沒看見、或是${action}的臉孔！）`,
+            `或許是${location}最深處的影子\n（還有那不斷${action}的聲音！）`
+        ];
+        const stanza3 = pick(s3_templates);
+
+        // --- 第四段：台詞與動作 ---
+        const s4_templates = [
+            `「${line}……」\n依然${action}的他`,
+            `「${line}……」\n${identity}在角落裡${action}`,
+            `「${line}……」\n他低著頭，${action}`
+        ];
+        const stanza4 = pick(s4_templates);
+
+        // --- 第五段：流言 ---
+        const s5_templates = [
+            `有人說\n${comment}`,
+            `也有人說\n${comment}`,
+            `甚至有人傳說\n${comment}`
+        ];
+        const stanza5 = pick(s5_templates);
+
+        // --- 第六段：結尾呼應 ---
+        const s6_templates = [
+            `一段${adjectives}的${noun}\n路人們談論他在每個${location}的轉角`,
+            `一種${adjectives}的${noun}\n每個${identity}重複著他在每個${location}裡`,
+            `那${adjectives}的${noun}啊\n至今仍${verb}${location}的風裡`
+        ];
+        const stanza6 = pick(s6_templates);
+
+        // 4. 組合 HTML
+        const poemHTML = `
+            <div class="poem-stanza">${stanza1}</div>
+            <div class="poem-stanza">${stanza2}</div>
+            <div class="poem-stanza">${stanza3}</div>
+            <div class="poem-stanza">${stanza4}</div>
+            <div class="poem-stanza">${stanza5}</div>
+            <div class="poem-stanza">${stanza6}</div>
+        `;
+
+        // 5. 渲染
+        document.getElementById('output-title').textContent = `〈${identity}〉`;
+        document.getElementById('output-content').innerHTML = poemHTML;
+
+        // 6. UI 動畫
+        const resultArea = document.getElementById('result-area');
+        resultArea.style.display = 'block';
+        resultArea.scrollIntoView({ behavior: 'smooth' });
+    });
+</script>
+
+</body>
+</html>
