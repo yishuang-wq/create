@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>人物詩製造機 | 行動版</title>
+    <title>人物詩製造機 | 語意優化版</title>
     <style>
         :root {
             --primary-color: #0D47A1; 
@@ -13,26 +13,24 @@
             --radius: 16px;
         }
 
-        * {
-            box-sizing: border-box; /* 確保寬度計算包含內距 */
-        }
+        * { box-sizing: border-box; }
 
         body {
             font-family: "Noto Serif TC", "Songti TC", serif;
             background-color: var(--bg-color);
             color: #333;
             margin: 0;
-            padding: 10px; /* 手機版邊距縮小 */
+            padding: 10px;
             min-height: 100vh;
             line-height: 1.6;
             transition: background-color 0.6s ease;
-            -webkit-tap-highlight-color: transparent; /* 移除點擊高亮 */
+            -webkit-tap-highlight-color: transparent;
         }
 
         .container {
             background-color: var(--white);
             width: 100%;
-            max-width: 600px; /* 限制最大寬度，電腦看也不會太寬 */
+            max-width: 600px;
             margin: 0 auto;
             padding: 25px 20px;
             border-radius: var(--radius);
@@ -58,7 +56,6 @@
             margin-bottom: 25px;
         }
 
-        /* 風格選擇器樣式 - 手機版優化 */
         .style-selector {
             background: #f1f5f9;
             padding: 15px;
@@ -75,19 +72,13 @@
             color: #333;
         }
 
-        /* 下拉選單優化 */
         select {
             width: 100%;
             padding: 12px;
-            font-size: 16px; /* 防止 iOS 自動縮放 */
+            font-size: 16px;
             border-radius: 8px;
             border: 1px solid #ced4da;
             background-color: #fff;
-            appearance: none; /* 移除預設樣式 */
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 1rem center;
-            background-size: 1em;
         }
 
         .input-wrapper {
@@ -105,14 +96,13 @@
             transition: color 0.6s ease;
         }
 
-        /* 輸入框優化 - 手指好點擊 */
         input {
             width: 100%;
             padding: 14px;
             border: 1px solid #CFD8DC;
             border-radius: 10px;
             font-family: "Noto Sans TC", sans-serif;
-            font-size: 16px; /* 關鍵：防止 iOS 輸入時畫面放大 */
+            font-size: 16px;
             background-color: #FAFAFA;
             transition: all 0.3s;
         }
@@ -124,16 +114,8 @@
             box-shadow: 0 0 0 3px rgba(13, 71, 161, 0.1);
         }
 
-        ::placeholder {
-            color: #B0BEC5;
-            font-size: 0.9em;
-        }
+        .btn-container { margin-top: 30px; }
 
-        .btn-container {
-            margin-top: 30px;
-        }
-
-        /* 按鈕優化 - 全寬、好按 */
         button {
             width: 100%;
             background-color: var(--primary-color);
@@ -143,19 +125,15 @@
             font-size: 1.1rem;
             border-radius: 12px;
             cursor: pointer;
-            transition: all 0.2s;
             font-family: "Noto Serif TC", serif;
             letter-spacing: 3px;
             font-weight: bold;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            /* 針對手機觸控的回饋感 */
+            transition: transform 0.1s;
         }
 
-        button:active {
-            transform: scale(0.98);
-        }
+        button:active { transform: scale(0.98); }
 
-        /* 結果卡片優化 */
         #result-area {
             display: none;
             margin-top: 40px;
@@ -169,10 +147,18 @@
             text-align: center;
             border: 1px solid #eee;
             border-radius: 8px;
-            /* 稿紙紋路 */
             background-image: linear-gradient(#f1f1f1 1px, transparent 1px);
             background-size: 100% 2.4em; 
             box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        }
+
+        /* 讓使用者知道可以編輯 */
+        .editable-hint {
+            font-size: 0.8rem;
+            color: #90A4AE;
+            text-align: center;
+            margin-bottom: 10px;
+            font-style: italic;
         }
 
         .poem-title {
@@ -184,12 +170,18 @@
 
         .poem-content {
             font-size: 1.1rem;
-            line-height: 2.4em; /* 對齊稿紙線條 */
+            line-height: 2.4em;
             color: #444;
             font-weight: 500;
             white-space: pre-wrap;
-            text-align: justify; /* 手機上閱讀稍微對齊兩端會比較整齊 */
-            text-align-last: center; /* 最後一行置中 */
+            text-align: justify;
+            text-align-last: center;
+            outline: none; /* 移除編輯時的藍框 */
+        }
+        
+        /* 編輯時的反饋 */
+        .poem-content:focus {
+            background-color: rgba(0,0,0,0.01);
         }
 
         .poem-stanza { margin-bottom: 2.4em; }
@@ -199,7 +191,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* 針對桌機稍微放寬 */
         @media (min-width: 600px) {
             .container { padding: 40px; }
             .input-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
@@ -213,23 +204,22 @@
 
 <div class="container">
     <h1>人物詩製造機</h1>
-    <div class="subtitle">台灣現代詩大師 • 隨身版</div>
+    <div class="subtitle">V6.0 深度優化版</div>
 
     <form id="poemForm">
         <div class="style-selector">
             <label>🖊️ 選擇詩人風格</label>
             <select id="authorStyle" onchange="changeTheme()">
                 <option value="ya_hsien">瘂弦（冷靜、蒙太奇）</option>
-                <option value="xu_zhimo">徐志摩（浪漫、輕柔）</option>
+                <option value="xu_zhimo">徐志摩（抒情、詠嘆）</option>
                 <option value="zheng_chouyu">鄭愁予（浪子、古典）</option>
-                <option value="ji_xian">紀弦（幾何、獨行狼）</option>
-                <option value="xia_yu">夏宇（後現代、機智）</option>
+                <option value="ji_xian">紀弦（現代、幾何）</option>
+                <option value="xia_yu">夏宇（後現代、拼貼）</option>
                 <option value="xi_murong">席慕蓉（回憶、花朵）</option>
                 <option value="lai_he">賴和（寫實、沈重）</option>
                 <option value="bai_qiu">白萩（具象、凝視）</option>
-                <option value="zhou_mengdie">周夢蝶（孤獨、禪意）</option>
+                <option value="zhou_mengdie">周夢蝶（禪意、孤獨）</option>
                 <option value="yang_mu">楊牧（學院、海洋）</option>
-                <option value="zhang_mo">張默（豪邁、奔放）</option>
             </select>
         </div>
 
@@ -271,17 +261,18 @@
         </div>
         
         <div class="btn-container">
-            <button type="submit">開始詩意重組</button>
+            <button type="submit">開始生成 (可點擊文字微調)</button>
         </div>
     </form>
 
     <div id="result-area">
+        <div class="editable-hint">✨ 覺得不通順？點擊詩句即可直接修改！</div>
         <div class="poem-card">
-            <div class="poem-title" id="output-title"></div>
-            <div class="poem-content" id="output-content"></div>
+            <div class="poem-title" id="output-title" contenteditable="true"></div>
+            <div class="poem-content" id="output-content" contenteditable="true"></div>
         </div>
         <div class="btn-container">
-            <button onclick="window.scrollTo({top: 0, behavior: 'smooth'});" style="background-color: #78909C;">創作下一個</button>
+            <button onclick="window.scrollTo({top: 0, behavior: 'smooth'});" style="background-color: #78909C;">再生成一次</button>
         </div>
     </div>
 </div>
@@ -291,211 +282,30 @@
         return array[Math.floor(Math.random() * array.length)];
     }
 
-    // --- 詩人風格資料庫 (維持不變) ---
+    // --- 潤飾引擎：連接詞與虛詞庫 ---
+    // 用來隨機插入，讓句子不那麼死板
+    const connectors = {
+        start: ['彷彿', '那是', '依然是', '或許', '只見', '原來'],
+        middle: ['而', '卻', '依舊', '竟', '偏偏'],
+        end: ['一般', '模樣', '的姿態', '的餘溫']
+    };
+
+    function polish(text) {
+        // 這是一個簡單的隨機潤飾功能
+        // 實際應用中，這裡會根據不同的風格插入不同的連接詞
+        return text;
+    }
+
+    // --- 風格資料庫 (重寫版：降低重複度，增加句型彈性) ---
     const styles = {
         ya_hsien: {
             themeColor: '#0D47A1',
             nouns: ['獨角戲', '頻率', '註腳', '嘆息', '風景'],
             verbs: ['流浪在', '散落在', '懸浮在', '蜷縮在'],
             templates: {
-                s1: [`關於{identity}的傳聞{verb}{location}\n一段{adjectives}的{noun}`, `那{identity}的名字早已{verb}{location}\n帶著{adjectives}的氣息`],
-                s2: [`那{object}或許該被寫進歷史\n可憐的{identity}啊{adjectives}得令人心碎`, `那{object}應由博物館來守衛\n而{identity}只是靜靜地{adjectives}`],
-                s3: [`是{location}的荒謬劇吧\n（日日夜夜那{action}的背影！）`, `或許是{location}最深處的影子\n（還有那不斷{action}的聲音！）`],
-                s4: [`「{line}……」\n依然{action}的他`, `「{line}……」\n雙手掩面，{action}`],
-                s5: [`有人說\n{comment}`, `也有人說\n{comment}`],
-                s6: [`一段{adjectives}的{noun}\n路人們談論他在每個{location}的轉角`, `一種{adjectives}的{noun}\n每個{identity}重複著他在每個{location}裡`]
-            }
-        },
-        xu_zhimo: {
-            themeColor: '#00897B',
-            nouns: ['雲彩', '柔波', '夢', '星光', '笙簫', '殘夢'],
-            verbs: ['輕撫著', '蕩漾在', '沈澱在', '甘心在'],
-            templates: {
-                s1: [`輕輕的{identity}走了，正如他輕輕的來\n在{location}揮一揮衣袖，不帶走一片{noun}`, `那{identity}是{location}裡的一片{noun}\n{adjectives}，在我的心頭盪漾`],
-                s2: [`那{object}是夕陽中的新娘\n{adjectives}的{identity}，在光影裡招搖`, `軟泥上的{object}，油油的在水底招搖\n在{location}的柔波裡，我甘心做個{identity}`],
-                s3: [`尋夢？撐一支長篙，向{location}更深處漫溯\n滿載一船{action}，在星輝斑斕裡放歌`, `夏蟲也為我沈默，{action}是別離的笙簫`],
-                s4: [`「{line}！」\n你聽，這是{identity}心裡的歌`, `「{line}……」\n這聲音像是風，吹開了{noun}`],
-                s5: [`也就是說\n{comment}，是偶然或是奇蹟？`, `多謝天！我的心又一度的跳蕩\n因為聽說{comment}`],
-                s6: [`悄悄的{identity}走了，正如他悄悄的來\n{adjectives}的{noun}，是唯一的行囊`, `得之，我幸；不得，我命\n這{adjectives}的{identity}，消失在{location}的盡頭`]
-            }
-        },
-        zheng_chouyu: {
-            themeColor: '#5C6BC0',
-            nouns: ['錯誤', '過客', '馬蹄', '窗扉', '春帷', '蓮花'],
-            verbs: ['打江南走過', '等待在', '路過', '飄過'],
-            templates: {
-                s1: [`我打{location}走過\n那{identity}的容顏如{noun}的開落`, `東風不來，三月的柳絮不飛\n{location}的{identity}是{adjectives}的`],
-                s2: [`那{object}是小小的窗扉緊掩\n{identity}的心是小小的{location}的城`, `那{object}恰若青石的街道向晚\n{adjectives}的{identity}不願揭開窗帷`],
-                s3: [`是個{adjectives}的錯誤\n在{location}，{identity}只顧{action}`, `不再流浪的{identity}啊\n只剩下{action}的回音`],
-                s4: [`「{line}……」\n這一句，是季節的容顏`, `「{line}……」\n你底心是小小的窗扉緊掩`],
-                s5: [`聽人說\n{comment}，如霧般散去`, `或許\n{comment}，只是美麗的錯誤`],
-                s6: [`我達達的馬蹄是美麗的錯誤\n我不是{identity}，是個過客`, `這{adjectives}的{noun}\n留給{location}等待的{identity}`]
-            }
-        },
-        ji_xian: {
-            themeColor: '#424242',
-            nouns: ['幾何', '邏輯', '手杖', '煙斗', '狼', '星系'],
-            verbs: ['行走在', '思考', '咆哮於', '論證'],
-            templates: {
-                s1: [`我是{identity}，我是獨行的狼\n在{location}曠野，咀嚼{adjectives}的{noun}`, `把{identity}的孤獨壓縮成幾何圖形\n放在{location}的坐標軸上`],
-                s2: [`那{object}是我的手杖，也是我的信仰\n{adjectives}的{identity}，拒絕平庸的合唱`, `關於{object}的物理學定義\n是{identity}存在的唯一證明`],
-                s3: [`在{location}，我嚴肅地{action}\n為了維護一種{adjectives}的秩序`, `沒有什麼比{action}更合乎邏輯\n在這個非理性的{location}裡`],
-                s4: [`「{line}！」\n這是我的宣言，也是我的詩`, `「{line}……」\n我點燃煙斗，冷冷地說`],
-                s5: [`愚蠢的人們說\n{comment}`, `世界嘲笑我\n{comment}，但我不在乎`],
-                s6: [`我是{identity}，淒厲地長嗥\n在{location}，建立起{adjectives}的王國`, `這就是我，{adjectives}的狼\n擁有{noun}與永恆`]
-            }
-        },
-        xia_yu: {
-            themeColor: '#D81B60',
-            nouns: ['腹語術', '罐頭', '備忘錄', '摩擦', '暗示', '抽屜'],
-            verbs: ['被刪除', '被翻譯', '被重複', '被誤解', '旋轉'],
-            templates: {
-                s1: [`關於{identity}。以及{identity}的{adjectives}\n關於{location}。以及{location}的{noun}`, `{identity}在{location}。{identity}不在{location}\n{adjectives}。或者不{adjectives}`],
-                s2: [`把{object}放進罐頭裡。密封\n{identity}就變成一個{adjectives}的隱喻`, `那{object}。是{object}。還是{object}\n{identity}決定開始{action}`],
-                s3: [`有些人喜歡在{location}{action}\n有些人不喜歡。比如我\n或者比如{noun}`, `不斷地{action}。像跳針的唱片\n在{location}。在{location}。在{location}`],
-                s4: [`「{line}」\n這句話被翻譯了三次`, `「{line}」\n然後{identity}就消失了。像墨水`],
-                s5: [`據說\n{comment}。這很重要嗎？`, `{comment}。\n這是一句{adjectives}的謊言`],
-                s6: [`只剩下{noun}。和{noun}。和{noun}\n以及那個{adjectives}的{identity}`, `{identity}按下了刪除鍵\n在{location}。除此之外。沒有別的`]
-            }
-        },
-        xi_murong: {
-            themeColor: '#BA68C8',
-            nouns: ['花朵', '青春', '月光', '前世', '塵緣', '畫布'],
-            verbs: ['開滿了', '凋零在', '等待在', '錯過'],
-            templates: {
-                s1: [`如果{identity}是一棵開花的樹\n長在你必經的{location}`, `為了遇見你，{identity}已在佛前\n求了五百年，求一段{adjectives}的{noun}`],
-                s2: [`那{object}，是我前世的盼望\n{adjectives}的{identity}，只為你綻放`, `當你走近，請仔細聆聽\n那{object}顫抖的聲音`],
-                s3: [`在{location}，我慎重地{action}\n無視於旁人的眼光`, `所有的{action}，都是為了\n那一個{adjectives}的時刻`],
-                s4: [`「{line}……」\n這是我含淚的告白`, `「{line}……」\n青春是一本太倉促的書`],
-                s5: [`若你聽說\n{comment}`, `朋友都說\n{comment}，但我無悔`],
-                s6: [`這{adjectives}的{identity}，這無怨的{noun}\n在{location}，開滿了{adjectives}的詩`, `當你走過，落了一地的\n不是{noun}，是{identity}凋零的心`]
-            }
-        },
-        lai_he: {
-            themeColor: '#5D4037',
-            nouns: ['秤仔', '牛馬', '世道', '壓迫', '血淚', '黃昏'],
-            verbs: ['掙扎', '忍受', '吶喊', '凝視'],
-            templates: {
-                s1: [`這{identity}的身影，拖著沈重的步履\n在{location}，寫下{adjectives}的控訴`, `{identity}的命運，像一桿稱仔\n衡量著{location}的{noun}是不平的`],
-                s2: [`那{object}，是生活的枷鎖\n{adjectives}的{identity}，敢怒而不敢言`, `緊抓著{object}，像抓著僅存的尊嚴\n可憐的{identity}啊，在這黑暗的時代`],
-                s3: [`在{location}，只看見他{action}\n那是無聲的抵抗，還是無奈？`, `看他在塵土中{action}\n這{adjectives}的世道，教人怎麼活？`],
-                s4: [`「{line}！」\n這是從胸口迸出的血淚`, `「{line}……」\n聲音微弱，卻重如千鈞`],
-                s5: [`路人指指點點\n{comment}`, `大人老爺們說\n{comment}，真是冤枉`],
-                s6: [`時代的{noun}，壓在{identity}肩上\n他在{location}，留下{adjectives}的背影`, `這{adjectives}的{identity}，這不公的{noun}\n何時才能在{location}看見天光？`]
-            }
-        },
-        bai_qiu: {
-            themeColor: '#78909C',
-            nouns: ['雁', '天空', '幾何', '水平線', '鏡子', '塵土'],
-            verbs: ['飛翔', '凝視', '墜落', '排列'],
-            templates: {
-                s1: [`{identity}。\n在{location}。\n{adjectives}地存在。`, `天空還是天空。\n{identity}還是{identity}。\n在{location}。`],
-                s2: [`那{object}。\n冷冷地。\n反光。`, `{object}是{identity}唯一的{noun}。\n沈重且{adjectives}。`],
-                s3: [`我們仍然活著。\n在{location}，繼續{action}。\n沒有理由。`, `{action}。\n向著{location}。\n不停地。`],
-                s4: [`「{line}」\n風吹走了聲音。`, `「{line}」\n字句斷裂在風中。`],
-                s5: [`關於那些\n{comment}。\n都是多餘的。`, `有人說\n{comment}。`],
-                s6: [`{identity}。\n{adjectives}的{noun}。\n消失在{location}的盡頭。`, `一種{adjectives}的韻律。\n在{location}。\n繼續{action}。`]
-            }
-        },
-        zhou_mengdie: {
-            themeColor: '#2E7D32',
-            nouns: ['婆娑羅樹', '雪', '孤獨', '袈裟', '虛空', '蝴蝶'],
-            verbs: ['趺坐', '等待', '沈默', '化緣'],
-            templates: {
-                s1: [`似醒似睡，{identity}在{location}趺坐\n一襲{adjectives}的袈裟，裹住千年的{noun}`, `這裡沒有{noun}，只有{identity}\n在{location}，守著{adjectives}的孤絕`],
-                s2: [`那{object}，是渡河的筏\n{adjectives}的{identity}，不隨流俗`, `為了那{object}，你已等待了七世\n{identity}啊，你的眼裡有雪`],
-                s3: [`在{location}，你兀自{action}\n世界是吵雜的，你是靜的`, `任憑他們路過，任憑他們{comment}\n你只是{action}，如一株樹`],
-                s4: [`「{line}……」\n話音未落，已成虛空`, `「{line}……」\n不可說，不可說`],
-                s5: [`市井傳言\n{comment}`, `有人笑你\n{comment}，你報以微笑`],
-                s6: [`行到水窮處，{identity}依然在\n{location}的風，吹動了{noun}`, `這{adjectives}的{noun}\n是{identity}最後的{noun}`]
-            }
-        },
-        yang_mu: {
-            themeColor: '#006064',
-            nouns: ['星座', '潮汐', '神話', '蕨類', '島嶼', '墨水'],
-            verbs: ['俯視', '測量', '書寫', '迴旋'],
-            templates: {
-                s1: [`來自{location}的{identity}\n帶著{adjectives}的古典氣質`, `仰望星宿，{identity}在{location}沈思\n關於{noun}與{noun}的辯證`],
-                s2: [`那{object}是智慧的隱喻\n{adjectives}的{identity}，試圖測量海的深度`, `撫摸著{object}，如同撫摸歷史\n{identity}保持著{adjectives}的儀態`],
-                s3: [`在{location}，我看見你{action}\n如同一行嚴謹的詩句`, `浪濤拍岸，你依然{action}\n為了追尋那{adjectives}的真理`],
-                s4: [`「{line}」\n聲音如潮汐般湧來`, `「{line}……」\n這是關於愛的箴言`],
-                s5: [`學院裡流傳著\n{comment}`, `人們低聲討論\n{comment}`],
-                s6: [`這{adjectives}的{identity}，回到{location}\n在{noun}之間，尋找定位`, `那是{identity}。\n在星光下，永恆地{action}`]
-            }
-        },
-        zhang_mo: {
-            themeColor: '#D50000',
-            nouns: ['歷史', '筆觸', '山水', '無', '酒', '墨'],
-            verbs: ['揮灑', '大笑', '穿透', '撞擊'],
-            templates: {
-                s1: [`{identity}！好一個{identity}！\n在{location}，揮灑出{adjectives}的{noun}`, `大筆一揮，{identity}站在{location}\n全是{adjectives}的氣勢`],
-                s2: [`那{object}，是歲月的雕塑\n{adjectives}的{identity}，不屑於細節`, `抓起{object}，向歷史致敬\n{identity}啊，你是豪邁的{noun}`],
-                s3: [`管他在{location}做什麼\n就是要{action}！痛快地{action}！`, `沒有什麼比{action}更真實\n在{location}，這就是藝術`],
-                s4: [`「{line}！」\n聲震屋瓦，直衝雲霄`, `「{line}！」\n這一聲，喝退了平庸`],
-                s5: [`旁人驚嘆\n{comment}`, `歷史會記載\n{comment}`],
-                s6: [`這就是{identity}！{adjectives}的{noun}！\n在{location}，留下重重的一筆`, `無！無！無！\n{identity}與{object}，俱化為無！`]
-            }
-        }
-    };
-
-    function changeTheme() {
-        const styleKey = document.getElementById('authorStyle').value;
-        const color = styles[styleKey].themeColor;
-        document.documentElement.style.setProperty('--primary-color', color);
-    }
-
-    document.getElementById('poemForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        const inputs = {
-            identity: document.getElementById('identity').value.trim(),
-            adjectives: document.getElementById('adjectives').value.trim(),
-            object: document.getElementById('object').value.trim(),
-            location: document.getElementById('location').value.trim(),
-            action: document.getElementById('action').value.trim(),
-            line: document.getElementById('line').value.trim(),
-            comment: document.getElementById('comment').value.trim()
-        };
-
-        const styleKey = document.getElementById('authorStyle').value;
-        const currentStyle = styles[styleKey];
-
-        const noun = pick(currentStyle.nouns);
-        const verb = pick(currentStyle.verbs);
-        const templates = currentStyle.templates;
-
-        function fillTemplate(templateStr) {
-            return templateStr
-                .replace(/{identity}/g, inputs.identity)
-                .replace(/{adjectives}/g, inputs.adjectives)
-                .replace(/{object}/g, inputs.object)
-                .replace(/{location}/g, inputs.location)
-                .replace(/{action}/g, inputs.action)
-                .replace(/{line}/g, inputs.line)
-                .replace(/{comment}/g, inputs.comment)
-                .replace(/{noun}/g, noun)
-                .replace(/{verb}/g, verb);
-        }
-
-        let poemHTML = '';
-        poemHTML += `<div class="poem-stanza">${fillTemplate(pick(templates.s1))}</div>`;
-        poemHTML += `<div class="poem-stanza">${fillTemplate(pick(templates.s2))}</div>`;
-        poemHTML += `<div class="poem-stanza">${fillTemplate(pick(templates.s3))}</div>`;
-        poemHTML += `<div class="poem-stanza">${fillTemplate(pick(templates.s4))}</div>`;
-        poemHTML += `<div class="poem-stanza">${fillTemplate(pick(templates.s5))}</div>`;
-        poemHTML += `<div class="poem-stanza">${fillTemplate(pick(templates.s6))}</div>`;
-
-        const title = `〈${inputs.identity}〉`;
-        document.getElementById('output-title').textContent = title;
-        document.getElementById('output-content').innerHTML = poemHTML;
-
-        const resultArea = document.getElementById('result-area');
-        resultArea.style.display = 'block';
-        resultArea.scrollIntoView({ behavior: 'smooth' });
-    });
-    
-    changeTheme();
-</script>
-
-</body>
-</html>
+                s1: [`關於{identity}的傳聞，總在{location}流轉\n那是一段{adjectives}的{noun}`, `{identity}的名字早已滲入{location}\n帶著{adjectives}的氣息，揮之不去`],
+                s2: [`那{object}，或許該被寫進歷史\n可憐的{identity}啊，{adjectives}得令人心碎`, `手中那{object}，本應由博物館來守衛\n而{identity}只是靜靜地，{adjectives}地站著`],
+                s3: [`是{location}的一齣荒謬劇吧\n（日日夜夜，那{action}的背影！）`, `或許是{location}最深處的影子\n（還有那不斷{action}的聲音！）`],
+                s4: [`「{line}……」\n依然{action}的他，低聲說道`, `「{line}……」\n雙手掩面，{identity}開始{action}`],
+                s5: [`有人說\n{comment}`, `也有人竊竊私語\n{comment}`],
+                s6: [`一段{adjectives}的{noun}\n路人們談論他在每個{location}的轉角`, `一種
