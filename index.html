@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>人物詩製造機 | V7.0 安全版</title>
+    <title>人物詩製造機 | V8.0 終極版</title>
     <style>
+        /* --- 基礎設定 --- */
         :root {
             --primary-color: #0D47A1; 
             --bg-color: #F0F4F8;
             --white: #ffffff;
-            --shadow: 0 4px 15px rgba(0,0,0,0.08);
-            --radius: 16px;
         }
 
         * { box-sizing: border-box; }
@@ -20,10 +19,9 @@
             background-color: var(--bg-color);
             color: #333;
             margin: 0;
-            padding: 10px;
+            padding: 15px;
             min-height: 100vh;
             line-height: 1.6;
-            -webkit-tap-highlight-color: transparent;
         }
 
         .container {
@@ -31,99 +29,402 @@
             width: 100%;
             max-width: 600px;
             margin: 0 auto;
-            padding: 25px 20px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             border-top: 6px solid var(--primary-color);
-            transition: border-color 0.6s ease;
         }
 
         h1 {
             color: var(--primary-color);
             text-align: center;
-            margin: 0 0 5px 0;
+            margin: 0 0 10px 0;
             font-weight: 800;
             font-size: 1.8rem;
-            letter-spacing: 2px;
         }
 
         .subtitle {
             text-align: center;
             color: #546E7A;
             font-size: 0.9rem;
-            margin-bottom: 25px;
-        }
-
-        /* 模擬表單容器 */
-        .form-container {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .style-selector {
-            background: #f1f5f9;
-            padding: 15px;
-            border-radius: 12px;
             margin-bottom: 20px;
-            border: 1px dashed #cfd8dc;
         }
 
-        .style-selector label {
-            font-size: 1rem;
-            font-weight: bold;
-            margin-bottom: 8px;
-            display: block;
-        }
-
-        select {
-            width: 100%;
-            padding: 12px;
-            font-size: 16px;
+        /* --- 輸入區樣式 --- */
+        .style-selector {
+            background: #eef2f6;
+            padding: 15px;
             border-radius: 8px;
-            border: 1px solid #ced4da;
-            background-color: #fff;
-        }
-
-        .input-group {
-            display: block;
+            margin-bottom: 15px;
+            border: 1px solid #dae1e7;
         }
 
         label {
             display: block;
-            font-weight: 700;
+            font-weight: bold;
             color: var(--primary-color);
             margin-bottom: 5px;
-            font-size: 0.95rem;
+            font-size: 1rem;
         }
 
-        input {
+        select, input {
             width: 100%;
-            padding: 14px;
-            border: 1px solid #CFD8DC;
-            border-radius: 10px;
-            font-family: "Noto Sans TC", sans-serif;
-            font-size: 16px;
-            background-color: #FAFAFA;
-            transition: all 0.3s;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: var(--primary-color);
+            padding: 12px;
+            font-size: 16px; /* 防止手機縮放 */
+            border-radius: 6px;
+            border: 1px solid #ccc;
             background-color: #fff;
-            box-shadow: 0 0 0 3px rgba(13, 71, 161, 0.1);
+            margin-bottom: 15px;
         }
 
-        .btn-container { margin-top: 30px; }
-
+        /* --- 按鈕樣式 --- */
         button {
             width: 100%;
             background-color: var(--primary-color);
             color: white;
             border: none;
-            padding: 16px;
-            font-size: 1.1rem;
-            border-radius: 12px;
+            padding: 18px;
+            font-size: 1.2rem;
+            border-radius: 50px;
             cursor: pointer;
-            font-family: "Noto Serif TC", serif;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            margin-top: 10px;
+        }
+
+        button:active {
+            transform: scale(0.98); /* 按下時的縮放感 */
+            background-color: #000;
+        }
+
+        /* --- 結果顯示區 (關鍵修正：移除隱藏動畫) --- */
+        #result-area {
+            display: none; /* 預設隱藏，JS 會開啟 */
+            margin-top: 40px;
+            border-top: 2px dashed #ccc;
+            padding-top: 20px;
+        }
+
+        .poem-card {
+            background-color: #fff;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #eee;
+            /* 模擬稿紙背景 */
+            background-image: linear-gradient(#f1f1f1 1px, transparent 1px);
+            background-size: 100% 2.4em; 
+        }
+
+        .poem-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin-bottom: 30px;
+            color: #000 !important; /* 強制黑色 */
+        }
+
+        .poem-content {
+            font-size: 1.2rem;
+            line-height: 2.4em;
+            color: #333 !important; /* 強制深色 */
+            white-space: pre-wrap;
+            text-align: justify;
+            text-align-last: center;
+        }
+
+        .editable-hint {
+            color: #888;
+            font-size: 0.8rem;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;900&family=Noto+Sans+TC:wght@300;400&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="container">
+    <h1>人物詩製造機</h1>
+    <div class="subtitle">V8.0 無動畫穩定版</div>
+
+    <div id="input-area">
+        <div class="style-selector">
+            <label>🖊️ 選擇詩人風格</label>
+            <select id="authorStyle" onchange="changeTheme()">
+                <option value="ya_hsien">瘂弦</option>
+                <option value="xu_zhimo">徐志摩</option>
+                <option value="zheng_chouyu">鄭愁予</option>
+                <option value="ji_xian">紀弦</option>
+                <option value="xia_yu">夏宇</option>
+                <option value="xi_murong">席慕蓉</option>
+                <option value="lai_he">賴和</option>
+                <option value="bai_qiu">白萩</option>
+                <option value="zhou_mengdie">周夢蝶</option>
+                <option value="yang_mu">楊牧</option>
+            </select>
+        </div>
+
+        <label>1. 主角身分</label>
+        <input type="text" id="identity" placeholder="例：過勞的工程師">
+
+        <label>2. 兩個形容詞</label>
+        <input type="text" id="adjectives" placeholder="例：焦慮又透明">
+
+        <label>3. 物件 / 特徵</label>
+        <input type="text" id="object" placeholder="例：沒電的耳機">
+
+        <label>4. 地點 / 場景</label>
+        <input type="text" id="location" placeholder="例：充滿藍光的機房">
+
+        <label>5. 常見動作 / 聲音</label>
+        <input type="text" id="action" placeholder="例：盯著螢幕嘆氣">
+
+        <label>6. 經典台詞</label>
+        <input type="text" id="line" placeholder="例：這行代碼沒問題">
+
+        <label>7. 他人對角色的評論</label>
+        <input type="text" id="comment" placeholder="例：聽說他像個機器人">
+        
+        <button type="button" id="generateBtn">👇 按這裡生成詩作</button>
+    </div>
+
+    <div id="result-area">
+        <div class="editable-hint">（點擊下方的文字可以直接修改喔！）</div>
+        <div class="poem-card">
+            <div class="poem-title" id="output-title" contenteditable="true"></div>
+            <div class="poem-content" id="output-content" contenteditable="true"></div>
+        </div>
+        <button onclick="window.scrollTo({top: 0, behavior: 'smooth'});" style="background-color: #78909C; margin-top:20px;">回到上面重寫</button>
+    </div>
+</div>
+
+<script>
+    // 1. 確保程式載入的測試 (可忽略)
+    console.log("Poem Generator Loaded");
+
+    // 2. 風格資料庫
+    const styles = {
+        ya_hsien: {
+            color: '#0D47A1',
+            nouns: ['獨角戲', '頻率', '註腳', '嘆息', '風景'],
+            verbs: ['流浪在', '散落在', '懸浮在', '蜷縮在'],
+            templates: [
+                "關於{identity}的傳聞，總在{location}流轉\n那是一段{adjectives}的{noun}",
+                "那{object}，或許該被寫進歷史\n可憐的{identity}啊，{adjectives}得令人心碎",
+                "是{location}的一齣荒謬劇吧\n（日日夜夜，那{action}的背影！）",
+                "「{line}……」\n依然{action}的他，低聲說道",
+                "有人說\n{comment}",
+                "一段{adjectives}的{noun}\n路人們談論他在每個{location}的轉角"
+            ]
+        },
+        xu_zhimo: {
+            color: '#00897B',
+            nouns: ['柔波', '星芒', '夢囈', '迴響', '微風'],
+            verbs: ['輕撫', '沈澱', '依戀', '追尋'],
+            templates: [
+                "假如{identity}是一片{noun}\n便會投映在{location}的波心",
+                "那{object}，是記憶裡的一抹豔影\n{adjectives}的{identity}，甘心做一條水草",
+                "尋夢？ 或是{action}？\n滿載一船星輝，在{location}放歌",
+                "「{line}！」\n你聽，這是{identity}心裡的迴響",
+                "不知道是誰說的\n{comment}",
+                "我不知道風是在哪一個方向吹\n只知道{identity}在{location}，{adjectives}地等"
+            ]
+        },
+        zheng_chouyu: {
+            color: '#5C6BC0',
+            nouns: ['跫音', '過客', '窗扉', '春帷', '蓮花'],
+            verbs: ['路過', '等待', '飄落', '緊掩'],
+            templates: [
+                "我打{location}走過\n那{identity}的容顏，如{noun}的開落",
+                "那{object}是小小的窗扉緊掩\n{identity}的心，是小小的{location}的城",
+                "是個{adjectives}的錯誤\n在{location}，{identity}只顧{action}",
+                "「{line}……」\n這一句，是季節的容顏",
+                "聽人說\n{comment}，如霧般散去",
+                "我達達的馬蹄是美麗的錯誤\n我不是{identity}，是個過客"
+            ]
+        },
+        ji_xian: {
+            color: '#424242',
+            nouns: ['幾何', '邏輯', '光譜', '煙斗', '星系'],
+            verbs: ['運算', '論證', '長嗥', '拒絕'],
+            templates: [
+                "關於{identity}的存在主義\n在{location}，被定義為{adjectives}的{noun}",
+                "那{object}是我的手杖，也是我的信仰\n{adjectives}的{identity}，拒絕平庸的合唱",
+                "在{location}，我嚴肅地{action}\n為了維護一種{adjectives}的秩序",
+                "「{line}！」\n這是我的宣言，也是我的詩",
+                "愚蠢的人們說\n{comment}",
+                "我是{identity}，淒厲地長嗥\n在{location}，建立起{adjectives}的王國"
+            ]
+        },
+        xia_yu: {
+            color: '#D81B60',
+            nouns: ['腹語術', '罐頭', '暗示', '誤讀', '抽屜'],
+            verbs: ['被刪除', '被翻譯', '被重複', '旋轉'],
+            templates: [
+                "關於{identity}。以及{identity}的{adjectives}\n關於{location}。以及{location}的{noun}",
+                "把{object}放進罐頭裡。密封\n{identity}就變成一個{adjectives}的隱喻",
+                "有些人喜歡在{location}{action}\n有些人不喜歡。比如我。或者比如{noun}",
+                "「{line}」\n這句話被翻譯了三次，意義全失",
+                "據說\n{comment}。這很重要嗎？",
+                "只剩下{noun}。和{noun}。和{noun}\n以及那個{adjectives}的{identity}"
+            ]
+        },
+        xi_murong: {
+            color: '#BA68C8',
+            nouns: ['花朵', '塵緣', '月光', '前世', '畫布'],
+            verbs: ['綻放', '凋零', '錯過', '回眸'],
+            templates: [
+                "如果{identity}是一棵開花的樹\n長在你必經的{location}",
+                "那{object}，是我前世的盼望\n{adjectives}的{identity}，只為你綻放",
+                "在{location}，我慎重地{action}\n無視於旁人的眼光",
+                "「{line}……」\n這是我含淚的告白",
+                "若你聽說\n{comment}",
+                "這{adjectives}的{identity}，這無怨的{noun}\n在{location}，開滿了{adjectives}的詩"
+            ]
+        },
+        lai_he: {
+            color: '#5D4037',
+            nouns: ['秤仔', '牛馬', '世道', '壓迫', '黃昏'],
+            verbs: ['掙扎', '忍受', '吶喊', '凝視'],
+            templates: [
+                "這{identity}的身影，拖著沈重的步履\n在{location}，寫下{adjectives}的控訴",
+                "那{object}，是生活的枷鎖\n{adjectives}的{identity}，敢怒而不敢言",
+                "在{location}，只看見他{action}\n那是無聲的抵抗，還是無奈？",
+                "「{line}！」\n這是從胸口迸出的血淚",
+                "路人指指點點\n{comment}",
+                "時代的{noun}，壓在{identity}肩上\n他在{location}，留下{adjectives}的背影"
+            ]
+        },
+        bai_qiu: {
+            color: '#78909C',
+            nouns: ['雁', '天空', '水平線', '鏡子', '塵土'],
+            verbs: ['飛翔', '凝視', '墜落', '排列'],
+            templates: [
+                "{identity}。\n在{location}。\n{adjectives}地存在。",
+                "那{object}。\n冷冷地。\n反光。",
+                "我們仍然活著。\n在{location}，繼續{action}。\n沒有理由。",
+                "「{line}」\n風吹走了聲音。",
+                "關於那些\n{comment}。\n都是多餘的。",
+                "{identity}。\n{adjectives}的{noun}。\n消失在{location}的盡頭。"
+            ]
+        },
+        zhou_mengdie: {
+            color: '#2E7D32',
+            nouns: ['婆娑羅樹', '雪', '袈裟', '虛空', '蝴蝶'],
+            verbs: ['趺坐', '等待', '沈默', '化緣'],
+            templates: [
+                "似醒似睡，{identity}在{location}趺坐\n一襲{adjectives}的袈裟，裹住千年的{noun}",
+                "那{object}，是渡河的筏\n{adjectives}的{identity}，不隨流俗",
+                "在{location}，你兀自{action}\n世界是吵雜的，你是靜的",
+                "「{line}……」\n話音未落，已成虛空",
+                "市井傳言\n{comment}",
+                "行到水窮處，{identity}依然在\n{location}的風，吹動了{noun}"
+            ]
+        },
+        yang_mu: {
+            color: '#006064',
+            nouns: ['星座', '潮汐', '神話', '島嶼', '墨水'],
+            verbs: ['俯視', '測量', '書寫', '迴旋'],
+            templates: [
+                "來自{location}的{identity}\n帶著{adjectives}的古典氣質",
+                "那{object}是智慧的隱喻\n{adjectives}的{identity}，試圖測量海的深度",
+                "在{location}，我看見你{action}\n如同一行嚴謹的詩句",
+                "「{line}」\n聲音如潮汐般湧來",
+                "學院裡流傳著\n{comment}",
+                "這{adjectives}的{identity}，回到{location}\n在{noun}之間，尋找定位"
+            ]
+        }
+    };
+
+    // 3. 核心工具函式
+    function pick(array) {
+        if (!array || array.length === 0) return "（無詞彙）";
+        return array[Math.floor(Math.random() * array.length)];
+    }
+
+    const connectors = ['彷彿', '那是', '依然是', '或許', '只見', '原來', '竟是', '宛如'];
+
+    function changeTheme() {
+        try {
+            const styleKey = document.getElementById('authorStyle').value;
+            const color = styles[styleKey].color;
+            document.documentElement.style.setProperty('--primary-color', color);
+            document.querySelector('h1').style.color = color;
+            document.querySelectorAll('button').forEach(btn => btn.style.backgroundColor = color);
+        } catch (e) {
+            console.error("Change Theme Error", e);
+        }
+    }
+
+    // 4. 生成邏輯
+    function generatePoem() {
+        try {
+            // 測試用的彈窗，如果看到這個，代表按鈕是好的
+            // alert("✅ 正在為您寫詩..."); 
+
+            // 獲取資料
+            const inputs = {
+                identity: document.getElementById('identity').value.trim() || "神秘人",
+                adjectives: document.getElementById('adjectives').value.trim() || "模糊的",
+                object: document.getElementById('object').value.trim() || "某個物件",
+                location: document.getElementById('location').value.trim() || "遠方",
+                action: document.getElementById('action').value.trim() || "發呆",
+                line: document.getElementById('line').value.trim() || "......",
+                comment: document.getElementById('comment').value.trim() || "不予置評"
+            };
+
+            const styleKey = document.getElementById('authorStyle').value;
+            const currentStyle = styles[styleKey];
+
+            // 隨機詞彙
+            const noun = pick(currentStyle.nouns);
+            const verb = pick(currentStyle.verbs);
+
+            // 填充模板
+            let poemHTML = "";
+            
+            // 遍歷該作者的 6 個段落模板
+            currentStyle.templates.forEach(templateStr => {
+                let text = templateStr
+                    .replace(/{identity}/g, inputs.identity)
+                    .replace(/{adjectives}/g, inputs.adjectives)
+                    .replace(/{object}/g, inputs.object)
+                    .replace(/{location}/g, inputs.location)
+                    .replace(/{action}/g, inputs.action)
+                    .replace(/{line}/g, inputs.line)
+                    .replace(/{comment}/g, inputs.comment)
+                    .replace(/{noun}/g, noun)
+                    .replace(/{verb}/g, verb);
+                
+                // 簡易潤飾：30% 機率在段落前加連接詞 (第一段除外)
+                if (Math.random() > 0.7 && !text.includes("關於")) {
+                    text = pick(connectors) + "，" + text;
+                }
+
+                poemHTML += `<div style="margin-bottom: 2em;">${text}</div>`;
+            });
+
+            // 渲染
+            document.getElementById('output-title').textContent = `〈${inputs.identity}〉`;
+            document.getElementById('output-content').innerHTML = poemHTML;
+
+            // 顯示結果 (使用最簡單的 style.display)
+            const resultArea = document.getElementById('result-area');
+            resultArea.style.display = 'block';
+            
+            // 捲動
+            resultArea.scrollIntoView({ behavior: 'smooth' });
+
+        } catch (error) {
+            alert("發生錯誤：" + error.message);
+        }
+    }
+
+    // 綁定按鈕
+    document.getElementById('generateBtn').onclick = generatePoem;
+    
+    // 初始化顏色
+    changeTheme();
+</script>
+
+</body>
+</html>
